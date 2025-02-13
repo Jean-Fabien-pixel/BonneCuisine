@@ -25,36 +25,31 @@ if (isset($_GET['action']) && $_GET['action'] == 'ajouter' && isset($_GET['no'])
     AjouterPanier($bd, $panier, $cookieName);
 } elseif (isset($_GET['action']) && $_GET['action'] == 'supprimer' && isset($_GET['no'])) {
     SupprimerPanier($bd, $panier, $cookieName);
+} elseif (!empty($_POST['email']) && isset($_POST['envoyerCommande'])) {
+    $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
+    // Envoyer l'email
+    EnvoyerMessage($bd, $email, $panier, $cookieName);
 } elseif (isset($_GET['action']) && $_GET['action'] == 'modifier' && isset($_GET['nb'])) {
     ModifierPanier($bd, $panier, $cookieName);
 }
 // Affichage du panier
-echo "<h3>Votre Commande :</h3>";
-
-if (empty($panier)) {
+if (!empty($_POST['email'])) {
+    echo "<p class='text-success text-center fw-bold'>Nous avons bien reçu votre commande. <br>
+            Votre colis vous sera livré dans les plus brefs délais. <br>
+            Merci de nous faire confiance !</strong></p>";
+} elseif (empty($panier)) {
+    print "<h3>Votre Commande :</h3>";
     print "&emsp;&emsp;&emsp; Aucune commande !";
 } else {
     $nb = count($panier);
-    $prixTotal = 0;
-    $livraison = isset($_POST['chkLivraison']) ? 15 : 0;
-
-
+    print "<h3>Votre Commande :</h3>";
     print ("<form method='post' action='commande.php?action=modifier&nb=$nb'>");
-    AfficherPanier($bd, $panier, $cookieName, $prixTotal);
-    print "<label><input type='checkbox' name='chkLivraison' value='15' " . ($livraison ? "checked" : "") . "> Livraison (15$)</label><br>
-                <button type='submit' name='modifierPanier' class='btn btn-warning mt-3'>Mettre à jour</button>
-                <p class='mt-3'>Le montant de votre facture (taxes incluses) : <strong> $prixTotal $</strong></p>
-                <button type='submit' class='btn btn-secondary mt-1' name='envoyerCommande' onclick='EnvoyerCommande()'>Envoyer la commande</button>
-                <input type='hidden' id='emailInput' name='email'>
-                <p class='mt-3'>Attention, 1$/personne sera ajouté à la facture pour les groupes de moins de 10 personnes.</p>
-            </form>";
+    AfficherPanier($bd, $panier, $cookieName);
+    print ("</form>");
 
-    if (!empty($_POST['email']) && isset($_POST['envoyerCommande'])) {
-        $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
-        // Envoyer l'email
-        EnvoyerMessage($bd, $email, $panier, $cookieName);
-        echo "<p class='text-success'>✅ Email envoyé à : <strong>$email</strong></p>";
-    }
+}
+if (!empty($_POST['email']) && isset($_POST['envoyerCommande'])) {
+    print "";
 }
 ?>
 

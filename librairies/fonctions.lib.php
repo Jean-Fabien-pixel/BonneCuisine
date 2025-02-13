@@ -1,11 +1,5 @@
 <?php
 
-function formatterTexte($texte)
-{
-    $newString = str_replace("'", "&apos;", $texte);
-    return $newString;
-}
-
 function connecterBD(&$bd)
 {
     try {
@@ -40,7 +34,7 @@ function AfficherMenu($bd)
     }
 }
 
-function AfficherPanier($bd, $panier, $cookieName, &$prixTotal)
+function AfficherPanier($bd, $panier, $cookieName)
 {
     $prixTotal = 0;
     $select = $bd->prepare("SELECT * FROM panier 
@@ -61,7 +55,7 @@ function AfficherPanier($bd, $panier, $cookieName, &$prixTotal)
 
         print "<p><strong>Menu: </strong> $nom</p>
                <label for='nbPersonne$id'>Nombre de personnes : 
-                   <input type='number' name='nbPersonne[$id]' value='$quantite'>
+                   <input type='number' name='nbPersonne[$id]' value='$quantite' min='0'>
                </label><br>
                <a href='commande.php?action=supprimer&no=$id' class='text-decoration-none'>Supprimer ce menu</a></p>";
     }
@@ -71,6 +65,14 @@ function AfficherPanier($bd, $panier, $cookieName, &$prixTotal)
         $prixTotal += 15;
     }
     $prixTotal = number_format($prixTotal, 2);
+    $livraison = isset($_POST['chkLivraison']) ? 15 : 0;
+    print "<label><input type='checkbox' name='chkLivraison' value='15' " . ($livraison ? "checked" : "") . "> Livraison (15$)</label><br>
+                <button type='submit' name='modifierPanier' class='btn btn-outline-success mt-3 btn-sm'>Mettre à jour</button>
+                <p class='mt-3'>Le montant de votre facture (taxes incluses) : <strong> $prixTotal $</strong></p>
+                <button type='submit' class='btn btn-secondary mt-1' name='envoyerCommande' onclick='EnvoyerCommande()'>Envoyer la commande</button>
+                <input type='hidden' id='emailInput' name='email'>
+                <p class='mt-3'>Attention, 1$/personne sera ajouté à la facture pour les groupes de moins de 10 personnes.</p>
+            ";
 }
 
 function AjouterPanier($bd, &$panier, $cookieName)
@@ -201,4 +203,8 @@ function EnvoyerMessage($bd, $courriel, $panier, $cookieName)
     mail($courriel, $objet, $message, $headers);
 
     setcookie($cookieName, "", time() - 3600); // Supprime le cookie si vide
+    $delete = $bd->prepare("DELETE FROM panier where idPanier = :idPanier");
+    $delete->execute([
+        'idPanier' => $cookieName,
+    ]);
 }
