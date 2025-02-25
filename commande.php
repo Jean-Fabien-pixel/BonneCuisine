@@ -1,8 +1,4 @@
 <?php
-require "inclus/entete.inc";
-require "librairies/fonctions.lib.php";
-$bd = null;
-connecterBD($bd);
 // Trouver le cookie existant (si présent)
 $cookieName = null;
 foreach ($_COOKIE as $name => $value) {
@@ -21,6 +17,11 @@ if (!$cookieName || !isset($_COOKIE[$cookieName])) {
     $panier = json_decode($_COOKIE[$cookieName], true);
 }
 
+require "inclus/entete.inc";
+require "librairies/fonctions.lib.php";
+$bd;
+connecterBD($bd);
+
 if (isset($_GET['action']) && $_GET['action'] == 'ajouter' && isset($_GET['no'])) {
     AjouterPanier($bd, $panier, $cookieName);
 } elseif (isset($_GET['action']) && $_GET['action'] == 'supprimer' && isset($_GET['no'])) {
@@ -28,7 +29,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'ajouter' && isset($_GET['no'])
 } elseif (!empty($_POST['email']) && isset($_POST['envoyerCommande'])) {
     $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
     // Envoyer l'email
-    EnvoyerMessage($bd, $email, $panier, $cookieName);
+    EnvoyerMessageCommande($bd, $email, $panier, $cookieName);
 } elseif (isset($_GET['action']) && $_GET['action'] == 'modifier' && isset($_GET['nb'])) {
     ModifierPanier($bd, $panier, $cookieName);
 }

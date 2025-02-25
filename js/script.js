@@ -52,3 +52,26 @@ function EnvoyerCommande() {
         document.querySelector("form").submit();
     }, 20000);
 }
+
+function RecupererEmailMdpOublie() {
+    var email = document.getElementById("courriel").value;
+    if (email.trim().length !== 0) {
+        console.log(email)
+        window.location.href = `connexion.php?identifiantsOublies=${encodeURIComponent(email)}`;
+    } else {
+        var placeErreur = document.getElementById("placeErreur");
+        placeErreur.innerHTML = "Entrez votre courriel dans le champ requis"
+    }
+}
+
+function VerifierMdp() {
+    var mdp1 = document.getElementById("password1").value,
+        mdp2 = document.getElementById("password2").value;
+
+    if (mdp1 !== mdp2) {
+        var placeErreur = document.getElementById("msgErreur")
+        placeErreur.innerHTML = "Les mots de passe ne correspondent pas";
+        return false;
+    }
+    return true
+}

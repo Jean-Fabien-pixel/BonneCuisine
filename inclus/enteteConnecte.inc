@@ -47,9 +47,10 @@
                                     class="nav-link text-light fw-bold"
                                     aria-current="page"
                                     href="menu.php"
-                            >Menu</a
-                            >
-                            <a class="nav-link text-light fw-bold" href="commande.php">Votre Commande</a>
+                            >Menus</a><strong class="m-2 text-light">-</strong>
+                            <a class="nav-link text-light fw-bold" href="">Ajouter Menu</a><strong class="m-2 text-light">-</strong>
+                            <a class="nav-link text-light fw-bold" href="">Modifier Menu</a><strong class="m-2 text-light">-</strong>
+                            <a class="nav-link text-light fw-bold" href="">Supprimer Menu</a>
                         </div>
                     </div>
                 </div>

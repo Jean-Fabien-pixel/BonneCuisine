@@ -10,7 +10,7 @@ function connecterBD(&$bd)
     }
 }
 
-function AfficherMenu($bd)
+function AfficherMenu($bd, $isSessionActive)
 {
     $requete = $bd->prepare("select * from menu_fr");
     $requete->execute();
@@ -28,7 +28,9 @@ function AfficherMenu($bd)
         print ("</div>");
         print ("</div>");
         print ("<div class='col-md-1 d-flex justify-content-center align-items-center'>");
-        print ("<a href='commande.php?action=ajouter&no=$ligne->idMenu' class='text-decoration-none'>Ajouter à la commande…</a>");
+        if (!$isSessionActive) {
+            print ("<a href='commande.php?action=ajouter&no=$ligne->idMenu' class='text-decoration-none'>Ajouter à la commande…</a>");
+        }
         print ("</div>");
         print ("</div>");
     }
@@ -62,7 +64,7 @@ function AfficherPanier($bd, $panier, $cookieName)
     $taxes = $prixTotal * 0.05 + $prixTotal * 0.09975;
     $prixTotal += $taxes;
     if (isset($_POST['chkLivraison'])) {
-        $prixTotal += 15;
+        $prixTotal += 15+15*0.05+15*0.09975;
     }
     $prixTotal = number_format($prixTotal, 2);
     $livraison = isset($_POST['chkLivraison']) ? 15 : 0;
@@ -156,7 +158,7 @@ function ModifierPanier($bd, &$panier, $cookieName)
     }
 }
 
-function EnvoyerMessage($bd, $courriel, $panier, $cookieName)
+function EnvoyerMessageCommande($bd, $courriel, $panier, $cookieName)
 {
     $prixTotal = 0;
     $select = $bd->prepare("SELECT * FROM panier 
@@ -186,7 +188,7 @@ function EnvoyerMessage($bd, $courriel, $panier, $cookieName)
     $taxes = $prixTotal * 0.05 + $prixTotal * 0.09975;
     $prixTotal += $taxes;
     if (isset($_POST['chkLivraison'])) {
-        $prixTotal += 15;
+        $prixTotal += 15+15*0.05+15*0.09975;
     }
     $prixTotal = number_format($prixTotal, 2);
     $message .= "Pour un total de " . $prixTotal . " $\n\n";
@@ -207,4 +209,99 @@ function EnvoyerMessage($bd, $courriel, $panier, $cookieName)
     $delete->execute([
         'idPanier' => $cookieName,
     ]);
+}
+
+function ValiderConnexion($bd, $courriel, $password)
+{
+    $valide = true;
+    $nb = 0;
+    $requete = $bd->prepare('SELECT * FROM usager WHERE courriel = :courriel');
+    $requete->execute([
+        'courriel' => $courriel
+    ]);
+
+    $nb = $requete->rowCount();
+    if ($nb == 0) {
+        $valide = false;
+    } else {
+        $ligne = $requete->fetch(PDO::FETCH_OBJ);
+        if (password_verify($password, $ligne->motPasse)) {
+            $valide = true;
+        } else {
+            $valide = false;
+        }
+    }
+    return $valide;
+}
+
+function VerifierEmail($bd, $courriel)
+{
+    $requete = $bd->prepare('SELECT * FROM usager WHERE courriel = :courriel');
+    $requete->execute([
+        'courriel' => $courriel
+    ]);
+    if ($requete->rowCount() > 0) {
+        return true;
+    }
+    return false;
+}
+
+function EnvoyerMessageChangeMdp($bd, $courriel)
+{
+    $requete = $bd->prepare('SELECT * FROM usager WHERE courriel = :courriel');
+    $requete->execute([
+        'courriel' => $courriel
+    ]);
+    $resultat = $requete->fetch(PDO::FETCH_OBJ);
+    $no = time() + 5 * 60;
+    $id = $resultat->idUsager;
+    $id = password_hash($id, PASSWORD_DEFAULT);
+
+    // Génération du lien avec le token
+    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
+    $lien = "$protocol://" . $_SERVER['SERVER_NAME'] . "/bonnecuisine/motPasse.php?no=$no&id=" . urlencode($id);
+
+    // Sujet du mail
+    $objet = "Réinitialisation de votre mot de passe - La Bonne Cuisine";
+
+    // Corps du message
+    $message = "Bonjour,\n\n";
+    $message .= "Vous avez fait une demande pour réinitialiser votre mot de passe.\n";
+    $message .= "Pour ce faire, cliquez sur le lien suivant :\n";
+    $message .= $lien . "\n\n";
+    $message .= "p.s. Vous avez un délai de 5 minutes. Dépassez ce délai, vous devrez refaire une nouvelle demande.\n\n";
+    $message .= "Si vous n'êtes pas à l'origine de cette demande, veuillez ne pas tenir compte de ce courriel.\n\n";
+    $message .= "Meilleures salutations,\n";
+    $message .= "L'équipe de La Bonne Cuisine";
+
+    // En-têtes du mail
+    $headers = "From: etudiant.info@collegealma.ca\r\n";
+    $headers .= "Reply-To: etudiant.info@collegealma.ca\r\n";
+    $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
+
+    // Envoi de l'email
+    return mail($courriel, $objet, $message, $headers);
+}
+
+function VerifierId($bd, $hashId)
+{
+    $requete = $bd->prepare('SELECT * FROM usager');
+    $requete->execute();
+    $resultat = $requete->fetchAll(PDO::FETCH_OBJ);
+    foreach ($resultat as $ligne) {
+        if (password_verify($ligne->idUsager, $hashId)) {
+            return $ligne;
+        }
+    }
+    return false;
+}
+
+function ChangeMdp($bd, $usager, $mdp)
+{
+    $requete = $bd->prepare('UPDATE usager SET motPasse = :motPasse WHERE idUsager = :idUsager');
+    $requete->execute([
+        'motPasse' => password_hash($mdp, PASSWORD_DEFAULT),
+        'idUsager' => $usager
+    ]);
+    header('Location: connexion.php');
 }
