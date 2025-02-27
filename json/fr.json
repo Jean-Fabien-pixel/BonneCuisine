@@ -1,0 +1,69 @@
+{
+  "index_texte1": "Bonjour,<br/><br/>\n        Pour une rencontre entre amis, une réunion, un party, ou pour toutes\n        autres occasions, faites affaire avec notre service de traiteur «La\n        Bonne Cuisine». À votre service depuis plus de 15 ans, notre personnel\n        saura répondre à vos besoins. <br/><br/>\n\n        Pour tout commentaires, questions ou suggestions, écrivez-nous à\n        l'adresse suivante\n        <a href=\"mailto:info@labonnecuisine.com\">info@labonnecuisine.com</a>",
+  "index_texte2": "Bon appétit !",
+
+  "menu_h3": "Voici nos différents menus :",
+  "menu_nom": "Nom :",
+  "menu_remarque": "Remarque :",
+  "menu_prix": "Prix :",
+  "menu_texte": "P.S. Le montant en devise <strong>USD</strong> est à titre indicatif. Ce dernier sera calculé au taux du jour lorsque la commande sera validée et effectuée",
+  "menu_ajouterCommande": "Ajouter à la commande…",
+
+  "connexion_courriel": "Courriel :",
+  "connexion_mdp": "Mot de passe :",
+  "connexion_erreurConnexion": "Le courriel ou le mot de passe est invalide",
+  "connexion_btnConnecter": "Se connecter",
+  "connexion_btnReset": "Annuler",
+  "connexion_mdpOublie": "Mot de passe oublié",
+  "connexion_succes": "<strong>Email envoyé !</strong><br><br> Un courriel vous a été envoyé pour réinitialiser votre mot de passe.",
+  "connexion_echec": "<strong>Oups !!</strong> <br><br>Vous n'êtes pas un utilisateur de notre plateforme !",
+
+  "commande_succes": "Nous avons bien reçu votre commande. <br>\n            Votre colis vous sera livré dans les plus brefs délais. <br>\n            Merci de nous faire confiance !</strong>",
+  "commande_h3": "Votre Commande :",
+  "commande_panierVide": "Aucune commande !",
+  "commande_menu": "Menu:",
+  "commande_nbPersonne": "Nombre de personnes :",
+  "commande_supprimerMenu": "Supprimer ce menu",
+  "commande_livraison": "Livraison",
+  "commande_mettreAjour": "Mettre à jour",
+  "commande_prixTotal": "Le montant de votre facture (taxes incluses) :",
+  "commande_envoyerCommande": "Envoyer la commande",
+  "commande_avis": "Attention, 1$/personne sera ajouté à la facture pour les groupes de moins de 10 personnes.",
+
+  "mdp_salutation": "Bonjour",
+  "mdp_nouveauMdp1": "Inscrire un nouveau mot de passe :",
+  "mdp_nouveauMdp2": "Réinscrire le nouveau mot de passe :",
+  "mdp_btnValider": "Valider",
+
+  "email_sujet": "Confirmation de votre commande - La Bonne Cuisine",
+  "email_intro": "Bonjour,\n\nNous vous remercions d'avoir commandé via notre service de traiteur «La Bonne Cuisine». Nos employés s'affairent à cuisiner votre commande pour votre plus grande satisfaction.\n\n",
+  "email_description": "Voici la description de votre commande :\n",
+  "email_produit": "-> {nom} pour {quantite} personnes\n\n",
+  "email_total": "Pour un total de {prixTotal} $\n\n",
+  "email_contact": "Un responsable communiquera avec vous dans les plus brefs délais.\n\n",
+  "email_conclusion": "À bientôt!\n\nL'équipe de La Bonne Cuisine",
+
+  "email_mdp_sujet": "Réinitialisation de votre mot de passe - La Bonne Cuisine",
+  "email_mdp_intro": "Bonjour,\n\nVous avez fait une demande pour réinitialiser votre mot de passe.\n",
+  "email_mdp_lien": "Pour ce faire, cliquez sur le lien suivant :\n{lien}\n\n",
+  "email_mdp_expiration": "p.s. Vous avez un délai de 5 minutes. Dépassez ce délai, vous devrez refaire une nouvelle demande.\n\n",
+  "email_mdp_ignore": "Si vous n'êtes pas à l'origine de cette demande, veuillez ne pas tenir compte de ce courriel.\n\n",
+  "email_mdp_conclusion": "Meilleures salutations,\nL'équipe de La Bonne Cuisine",
+
+  "email_prompt": "Veuillez entrer votre email pour la commande :",
+  "email_requis": "⚠ Email requis pour valider la commande.",
+  "email_invalide": "⚠ Veuillez entrer un email valide.",
+
+  "email_mdp_oublie": "Entrez votre courriel dans le champ requis",
+
+  "mdp_non_correspondant": "Les mots de passe ne correspondent pas",
+
+  "header_menu": "Menu",
+  "header_commande": "Votre commande",
+  "header_ajouterMenu": "Ajouter Menu",
+  "header_modifierMenu": "Modifier Menu",
+  "header_supprimerMenu": "Supprimer Menu",
+
+  "footer_connexion": "Connexion",
+  "footer_deconnexion": "Déconnexion"
+}

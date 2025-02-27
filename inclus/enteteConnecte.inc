@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="<?= $_COOKIE["lang"] ?? 'fr'; ?>">
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -19,10 +19,10 @@
     <div class="row card">
         <div class="card-body bg-primary">
             <div class="text-end">
-                <a class="text-decoration-none text-light fw-bold" href=""
+                <a class="text-decoration-none text-light fw-bold" href="?lang=fr"
                 >Français</a>
                 <strong class="text-light">/</strong>
-                <a class="text-decoration-none text-light fw-bold" href=""
+                <a class="text-decoration-none text-light fw-bold" href="?lang=en"
                 >English</a>
             </div>
             <nav class="navbar navbar-expand-lg">
@@ -47,10 +47,15 @@
                                     class="nav-link text-light fw-bold"
                                     aria-current="page"
                                     href="menu.php"
-                            >Menus</a><strong class="m-2 text-light">-</strong>
-                            <a class="nav-link text-light fw-bold" href="">Ajouter Menu</a><strong class="m-2 text-light">-</strong>
-                            <a class="nav-link text-light fw-bold" href="">Modifier Menu</a><strong class="m-2 text-light">-</strong>
-                            <a class="nav-link text-light fw-bold" href="">Supprimer Menu</a>
+                            ><?= $translations["header_menu"] ?></a><strong class="m-2 text-light">-</strong>
+                            <a class="nav-link text-light fw-bold"
+                               href=""><?= $translations["header_ajouterMenu"] ?></a><strong
+                                    class="m-2 text-light">-</strong>
+                            <a class="nav-link text-light fw-bold"
+                               href=""><?= $translations["header_modifierMenu"] ?></a><strong
+                                    class="m-2 text-light">-</strong>
+                            <a class="nav-link text-light fw-bold"
+                               href=""><?= $translations["header_supprimerMenu"] ?></a>
                         </div>
                     </div>
                 </div>

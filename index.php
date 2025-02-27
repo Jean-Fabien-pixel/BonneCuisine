@@ -5,6 +5,9 @@ if (isset($_GET["action"])) {
         session_destroy();
     }
 }
+require "librairies/fonctions.lib.php";
+$translations = choisirLangue();
+
 // Définition de l'en-tête à inclure
 $entete = isset($_SESSION['courriel']) ? 'inclus/enteteConnecte.inc' : 'inclus/entete.inc';
 
@@ -13,17 +16,10 @@ require($entete);
 
 ?>
     <p>
-        Bonjour,<br/><br/>
-        Pour une rencontre entre amis, une réunion, un party, ou pour toutes
-        autres occasions, faites affaire avec notre service de traiteur «La
-        Bonne Cuisine». À votre service depuis plus de 15 ans, notre personnel
-        saura répondre à vos besoins. <br/><br/>
-
-        Pour tout commentaires, questions ou suggestions, écrivez-nous à
-        l'adresse suivante
+        <?= $translations["index_texte1"]; ?>
         <a href="mailto:info@labonnecuisine.com">info@labonnecuisine.com</a>
     </p>
-    <p class="text-left">Bon appétit !</p>
+    <p class="text-left"><?= $translations["index_texte2"]; ?></p>
 
 <?php if (isset($_SESSION['courriel'])) {
     require('inclus/piedPageConnecte.inc');

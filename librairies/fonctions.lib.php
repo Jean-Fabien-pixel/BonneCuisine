@@ -10,9 +10,12 @@ function connecterBD(&$bd)
     }
 }
 
-function AfficherMenu($bd, $isSessionActive)
+function AfficherMenu($bd, $isSessionActive, $lang, $translations)
 {
-    $requete = $bd->prepare("select * from menu_fr");
+    // Déterminer la table de menu selon la langue
+    $tableMenu = "menu_" . $lang;
+
+    $requete = $bd->prepare("SELECT * FROM $tableMenu");
     $requete->execute();
     $resultat = $requete->fetchAll(PDO::FETCH_OBJ);
     foreach ($resultat as $ligne) {
@@ -22,25 +25,30 @@ function AfficherMenu($bd, $isSessionActive)
         print ("</div>");
         print ("<div class ='col-md-8 col position-relative' style = 'text-align: start;'>");
         print ("<div class ='position-relative top-50 start-50 translate-middle'>");
-        print ("<strong>Nom : </strong>$ligne->nom <br/>");
-        print ("<strong>Remarque : </strong>$ligne->description <br/>");
-        print ("<strong>Prix : </strong>$ligne->prix \$ CAD <br/>");
+        print ("<strong>" . $translations["menu_nom"] . " </strong>$ligne->nom <br/>");
+        print ("<strong>" . $translations["menu_remarque"] . " </strong>$ligne->description <br/>");
+        print ("<strong>" . $translations["menu_prix"] . " </strong>$ligne->prix \$ CAD <br/>");
         print ("</div>");
         print ("</div>");
         print ("<div class='col-md-1 d-flex justify-content-center align-items-center'>");
         if (!$isSessionActive) {
-            print ("<a href='commande.php?action=ajouter&no=$ligne->idMenu' class='text-decoration-none'>Ajouter à la commande…</a>");
+            print ("<a href='commande.php?action=ajouter&no=$ligne->idMenu' class='text-decoration-none'>"
+                . $translations["menu_ajouterCommande"] . "</a>");
         }
         print ("</div>");
         print ("</div>");
     }
 }
 
-function AfficherPanier($bd, $panier, $cookieName)
+function AfficherPanier($bd, $panier, $cookieName, $translations)
 {
+    // Déterminer la table de menu selon la langue
+    $lang = $_COOKIE["lang"] ?? 'fr';
+    $tableMenu = "menu_" . $lang;
+
     $prixTotal = 0;
     $select = $bd->prepare("SELECT * FROM panier 
-                            JOIN cuisine.menu_fr mf ON mf.idMenu = panier.noProduit 
+                            JOIN cuisine.$tableMenu menu ON menu.idMenu = panier.noProduit 
                             WHERE idPanier = :cookieName");
     $select->execute([
         'cookieName' => $cookieName
@@ -55,25 +63,26 @@ function AfficherPanier($bd, $panier, $cookieName)
         $prix += ($quantite < 10) ? 1 : 0;
         $prixTotal += $prix * $quantite;
 
-        print "<p><strong>Menu: </strong> $nom</p>
-               <label for='nbPersonne$id'>Nombre de personnes : 
-                   <input type='number' name='nbPersonne[$id]' value='$quantite' min='0'>
+        print "<p><strong>" . $translations["commande_menu"] . " </strong> $nom</p>
+               <label for='nbPersonne$id'>" . $translations["commande_nbPersonne"] . " 
+                   <input type='number' name='nbPersonne[$id]' id='nbPersonne$id' value='$quantite' min='0'>
                </label><br>
-               <a href='commande.php?action=supprimer&no=$id' class='text-decoration-none'>Supprimer ce menu</a></p>";
+               <a href='commande.php?action=supprimer&no=$id' class='text-decoration-none'>" . $translations["commande_supprimerMenu"] . "</a></p>";
     }
     $taxes = $prixTotal * 0.05 + $prixTotal * 0.09975;
     $prixTotal += $taxes;
     if (isset($_POST['chkLivraison'])) {
-        $prixTotal += 15+15*0.05+15*0.09975;
+        $prixTotal += 15 + 15 * 0.05 + 15 * 0.09975;
     }
     $prixTotal = number_format($prixTotal, 2);
     $livraison = isset($_POST['chkLivraison']) ? 15 : 0;
-    print "<label><input type='checkbox' name='chkLivraison' value='15' " . ($livraison ? "checked" : "") . "> Livraison (15$)</label><br>
-                <button type='submit' name='modifierPanier' class='btn btn-outline-success mt-3 btn-sm'>Mettre à jour</button>
-                <p class='mt-3'>Le montant de votre facture (taxes incluses) : <strong> $prixTotal $</strong></p>
-                <button type='submit' class='btn btn-secondary mt-1' name='envoyerCommande' onclick='EnvoyerCommande()'>Envoyer la commande</button>
-                <input type='hidden' id='emailInput' name='email'>
-                <p class='mt-3'>Attention, 1$/personne sera ajouté à la facture pour les groupes de moins de 10 personnes.</p>
+    print "<label><input type='checkbox' name='chkLivraison' value='15' " . ($livraison ? "checked" : "") . "> " . $translations["commande_livraison"] . " (15$)</label><br>
+                <button type='submit' name='modifierPanier' class='btn btn-outline-success mt-3 btn-sm'>" . $translations["commande_mettreAjour"] . "</button>
+                <p class='mt-3'>" . $translations["commande_prixTotal"] . " <strong> $prixTotal $</strong></p>
+                <button type='submit' class='btn btn-secondary mt-1' name='envoyerCommande' onclick='EnvoyerCommande()'>"
+        . $translations["commande_envoyerCommande"] . "</button>
+                <input type='hidden' id='emailInput' name='email' value=''>
+                <p class='mt-3'>" . $translations["commande_avis"] . "</p>
             ";
 }
 
@@ -160,22 +169,26 @@ function ModifierPanier($bd, &$panier, $cookieName)
 
 function EnvoyerMessageCommande($bd, $courriel, $panier, $cookieName)
 {
+    // Déterminer la langue et charger la traduction
+    $lang = $_COOKIE["lang"] ?? 'fr';
+    $translations = json_decode(file_get_contents("json/" . $lang . ".json"), true);
+
+    // Déterminer la table de menu selon la langue
+    $tableMenu = "menu_" . $lang;
+
     $prixTotal = 0;
     $select = $bd->prepare("SELECT * FROM panier 
-                            JOIN cuisine.menu_fr mf ON mf.idMenu = panier.noProduit 
+                            JOIN cuisine.$tableMenu menu ON menu.idMenu = panier.noProduit 
                             WHERE idPanier = :cookieName");
     $select->execute([
         'cookieName' => $cookieName
     ]);
     $resultat = $select->fetchAll(PDO::FETCH_OBJ);
 
-    // Sujet de l'email
-    $objet = "Confirmation de votre commande - La Bonne Cuisine";
+    // Construire le message en utilisant les traductions
+    $message = $translations["email_intro"];
+    $message .= $translations["email_description"];
 
-    // Construire le message
-    $message = "Bonjour,\n\n";
-    $message .= "Nous vous remercions d'avoir commandé via notre service de traiteur «La Bonne Cuisine». Nos employés s'affairent à cuisiner votre commande pour votre plus grande satisfaction.\n\n";
-    $message .= "Voici la description de votre commande :\n";
     foreach ($resultat as $ligne) {
         $id = $ligne->idMenu;
         $nom = htmlspecialchars($ligne->nom);
@@ -183,18 +196,22 @@ function EnvoyerMessageCommande($bd, $courriel, $panier, $cookieName)
         $quantite = $panier[$id] ?? 1;
         $prixTotal += $prix * $quantite;
 
-        $message .= "-> " . $nom . " pour " . $quantite . " personnes\n\n";
+        $message .= str_replace(["{nom}", "{quantite}"], [$nom, $quantite], $translations["email_produit"]);
     }
+
     $taxes = $prixTotal * 0.05 + $prixTotal * 0.09975;
     $prixTotal += $taxes;
     if (isset($_POST['chkLivraison'])) {
-        $prixTotal += 15+15*0.05+15*0.09975;
+        $prixTotal += 15 + 15 * 0.05 + 15 * 0.09975;
     }
     $prixTotal = number_format($prixTotal, 2);
-    $message .= "Pour un total de " . $prixTotal . " $\n\n";
-    $message .= "Un responsable communiquera avec vous dans les plus brefs délais.\n\n";
-    $message .= "À bientôt!\n\n";
-    $message .= "L'équipe de La Bonne Cuisine";
+
+    $message .= str_replace("{prixTotal}", $prixTotal, $translations["email_total"]);
+    $message .= $translations["email_contact"];
+    $message .= $translations["email_conclusion"];
+
+    // Sujet de l'email
+    $objet = $translations["email_sujet"];
 
     // En-têtes de l'email
     $headers = "From: etudiant.info@collegealma.ca\r\n";
@@ -204,8 +221,9 @@ function EnvoyerMessageCommande($bd, $courriel, $panier, $cookieName)
     // Envoyer l'email
     mail($courriel, $objet, $message, $headers);
 
-    setcookie($cookieName, "", time() - 3600); // Supprime le cookie si vide
-    $delete = $bd->prepare("DELETE FROM panier where idPanier = :idPanier");
+    // Supprimer le panier après envoi
+    setcookie($cookieName, "", time() - 3600);
+    $delete = $bd->prepare("DELETE FROM panier WHERE idPanier = :idPanier");
     $delete->execute([
         'idPanier' => $cookieName,
     ]);
@@ -246,33 +264,35 @@ function VerifierEmail($bd, $courriel)
     return false;
 }
 
-function EnvoyerMessageChangeMdp($bd, $courriel)
+function EnvoyerMessageChangeMdp($bd, $courriel, $translations)
 {
+    // Déterminer la langue et charger la traduction
+    $lang = $_COOKIE["lang"] ?? 'fr';
+
+    // Récupérer l'utilisateur
     $requete = $bd->prepare('SELECT * FROM usager WHERE courriel = :courriel');
     $requete->execute([
         'courriel' => $courriel
     ]);
     $resultat = $requete->fetch(PDO::FETCH_OBJ);
+
+    // Génération du token et du lien
     $no = time() + 5 * 60;
     $id = $resultat->idUsager;
     $id = password_hash($id, PASSWORD_DEFAULT);
 
-    // Génération du lien avec le token
     $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
     $lien = "$protocol://" . $_SERVER['SERVER_NAME'] . "/bonnecuisine/motPasse.php?no=$no&id=" . urlencode($id);
 
-    // Sujet du mail
-    $objet = "Réinitialisation de votre mot de passe - La Bonne Cuisine";
+    // Construire le message avec les traductions
+    $message = $translations["email_mdp_intro"];
+    $message .= str_replace("{lien}", $lien, $translations["email_mdp_lien"]);
+    $message .= $translations["email_mdp_expiration"];
+    $message .= $translations["email_mdp_ignore"];
+    $message .= $translations["email_mdp_conclusion"];
 
-    // Corps du message
-    $message = "Bonjour,\n\n";
-    $message .= "Vous avez fait une demande pour réinitialiser votre mot de passe.\n";
-    $message .= "Pour ce faire, cliquez sur le lien suivant :\n";
-    $message .= $lien . "\n\n";
-    $message .= "p.s. Vous avez un délai de 5 minutes. Dépassez ce délai, vous devrez refaire une nouvelle demande.\n\n";
-    $message .= "Si vous n'êtes pas à l'origine de cette demande, veuillez ne pas tenir compte de ce courriel.\n\n";
-    $message .= "Meilleures salutations,\n";
-    $message .= "L'équipe de La Bonne Cuisine";
+    // Sujet du mail
+    $objet = $translations["email_mdp_sujet"];
 
     // En-têtes du mail
     $headers = "From: etudiant.info@collegealma.ca\r\n";
@@ -304,4 +324,17 @@ function ChangeMdp($bd, $usager, $mdp)
         'idUsager' => $usager
     ]);
     header('Location: connexion.php');
+}
+
+function choisirLangue()
+{
+    $lang = $_COOKIE["lang"] ?? 'fr';
+    if (isset($_GET["lang"])) {
+        $lang = $_GET["lang"];
+        setcookie("lang", $lang, time() + (86400 * 365), "/");
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit();
+    }
+    $contenu_fichier_json = file_get_contents("json/" . $lang . ".json");
+    return json_decode($contenu_fichier_json, true);
 }

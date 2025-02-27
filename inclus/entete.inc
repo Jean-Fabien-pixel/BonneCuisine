@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="<?= $_COOKIE["lang"] ?? 'fr'; ?>">
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -19,10 +19,10 @@
     <div class="row card">
         <div class="card-body bg-primary">
             <div class="text-end">
-                <a class="text-decoration-none text-light fw-bold" href=""
+                <a class="text-decoration-none text-light fw-bold" href="?lang=fr"
                 >Français</a>
                 <strong class="text-light">/</strong>
-                <a class="text-decoration-none text-light fw-bold" href=""
+                <a class="text-decoration-none text-light fw-bold" href="?lang=en"
                 >English</a>
             </div>
             <nav class="navbar navbar-expand-lg">
@@ -47,9 +47,10 @@
                                     class="nav-link text-light fw-bold"
                                     aria-current="page"
                                     href="menu.php"
-                            >Menu</a
+                            ><?= $translations["header_menu"] ?></a
                             >
-                            <a class="nav-link text-light fw-bold" href="commande.php">Votre Commande</a>
+                            <a class="nav-link text-light fw-bold"
+                               href="commande.php"><?= $translations["header_commande"] ?></a>
                         </div>
                     </div>
                 </div>

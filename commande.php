@@ -1,5 +1,5 @@
 <?php
-// Trouver le cookie existant (si présent)
+require "librairies/fonctions.lib.php";
 $cookieName = null;
 foreach ($_COOKIE as $name => $value) {
     if (str_starts_with($name, "panier_")) { // Si le cookie commence par "panier"
@@ -8,7 +8,6 @@ foreach ($_COOKIE as $name => $value) {
         break;
     }
 }
-
 if (!$cookieName || !isset($_COOKIE[$cookieName])) {
     $cookieName = "panier_" . uniqid();
     $panier = [];
@@ -17,8 +16,9 @@ if (!$cookieName || !isset($_COOKIE[$cookieName])) {
     $panier = json_decode($_COOKIE[$cookieName], true);
 }
 
+$translations = choisirLangue();
+
 require "inclus/entete.inc";
-require "librairies/fonctions.lib.php";
 $bd;
 connecterBD($bd);
 
@@ -35,22 +35,16 @@ if (isset($_GET['action']) && $_GET['action'] == 'ajouter' && isset($_GET['no'])
 }
 // Affichage du panier
 if (!empty($_POST['email'])) {
-    echo "<p class='text-success text-center fw-bold'>Nous avons bien reçu votre commande. <br>
-            Votre colis vous sera livré dans les plus brefs délais. <br>
-            Merci de nous faire confiance !</strong></p>";
+    echo "<p class='text-success text-center fw-bold'>".$translations["commande_succes"]."</p>";
 } elseif (empty($panier)) {
-    print "<h3>Votre Commande :</h3>";
-    print "&emsp;&emsp;&emsp; Aucune commande !";
+    print "<h3>".$translations["commande_h3"]."</h3>";
+    print "&emsp;&emsp;&emsp; ".$translations["commande_panierVide"];
 } else {
     $nb = count($panier);
-    print "<h3>Votre Commande :</h3>";
+    print "<h3>".$translations["commande_h3"]."</h3>";
     print ("<form method='post' action='commande.php?action=modifier&nb=$nb'>");
-    AfficherPanier($bd, $panier, $cookieName);
+    AfficherPanier($bd, $panier, $cookieName, $translations);
     print ("</form>");
-
-}
-if (!empty($_POST['email']) && isset($_POST['envoyerCommande'])) {
-    print "";
 }
 ?>
 
