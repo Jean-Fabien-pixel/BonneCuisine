@@ -1,14 +1,12 @@
 {
   "index_texte1": "Hello,<br/><br/>\n For a meeting with friends, a reunion, a party, or for any other\n occasion, do business with our catering service \"La\n Bonne Cuisine\". At your service for over 15 years, our staff\n will be able to meet your needs. <br/><br/>\n\n For any comments, questions or suggestions, write to us at\n the following address\n <a href=\"mailto:info@labonnecuisine.com\">info@labonnecuisine.com</a>",
   "index_texte2": "Bon appétit!",
-
   "menu_h3": "Here are our different menus:",
   "menu_nom": "Name :",
   "menu_remarque": "Note :",
   "menu_prix": "Price :",
   "menu_texte": "P.S. The amount in <strong>USD</strong> currency is for information purposes only. It will be calculated at the daily rate when the order is validated and placed",
   "menu_ajouterCommande": "Add to order…",
-
   "connexion_courriel": "Email:",
   "connexion_mdp": "Password:",
   "connexion_erreurConnexion": "The email or password is invalid",
@@ -17,24 +15,21 @@
   "connexion_mdpOublie": "Forgotten password",
   "connexion_succes": "<strong>Email sent!</strong><br><br> An email has been sent to you to reset your password.",
   "connexion_echec": "<strong>Oops!!</strong> <br><br>You are not a user of our platform!",
-
   "commande_succes": "We have received your order. <br>\n Your package will be delivered to you as soon as possible. <br>\n Thank you for trusting us!",
   "commande_h3": "Your Order:",
   "commande_panierVide": "No order!",
   "commande_menu": "Menu:",
-"commande_nbPersonne": "Number of people:",
-"commande_supprimerMenu": "Delete this menu",
-"commande_livraison": "Delivery",
-"commande_mettreAjour": "Update",
-"commande_prixTotal": "The amount of your invoice (taxes included):",
-"commande_envoyerCommande": "Send the order",
-"commande_avis": "Warning, $1/person will be added to the invoice for groups of less than 10 people.",
-
+  "commande_nbPersonne": "Number of people:",
+  "commande_supprimerMenu": "Delete this menu",
+  "commande_livraison": "Delivery",
+  "commande_mettreAjour": "Update",
+  "commande_prixTotal": "The amount of your invoice (taxes included):",
+  "commande_envoyerCommande": "Send the order",
+  "commande_avis": "Warning, $1/person will be added to the invoice for groups of less than 10 people.",
   "mdp_salutation": "Hello",
   "mdp_nouveauMdp1": "Enter a new password:",
-"mdp_nouveauMdp2": "Re-enter the new password:",
-"mdp_btnValider": "Validate",
-
+  "mdp_nouveauMdp2": "Re-enter the new password:",
+  "mdp_btnValider": "Validate",
   "email_sujet": "Order Confirmation - La Bonne Cuisine",
   "email_intro": "Hello,\n\nThank you for ordering from our catering service 'La Bonne Cuisine'. Our staff is working hard to prepare your order to your satisfaction.\n\n",
   "email_description": "Here is the description of your order:\n",
@@ -42,29 +37,22 @@
   "email_total": "For a total of {prixTotal} $\n\n",
   "email_contact": "A representative will contact you as soon as possible.\n\n",
   "email_conclusion": "See you soon!\n\nThe team at La Bonne Cuisine",
-
   "email_mdp_sujet": "Password Reset - La Bonne Cuisine",
   "email_mdp_intro": "Hello,\n\nYou have requested to reset your password.\n",
   "email_mdp_lien": "To proceed, click on the following link:\n{lien}\n\n",
   "email_mdp_expiration": "p.s. You have 5 minutes to complete this action. After that, you will need to request a new link.\n\n",
   "email_mdp_ignore": "If you did not request this, please ignore this email.\n\n",
   "email_mdp_conclusion": "Best regards,\nThe La Bonne Cuisine Team",
-
-
   "email_prompt": "Please enter your email for the order:",
   "email_requis": "⚠ Email required to validate the order.",
   "email_invalide": "⚠ Please enter a valid email.",
-
   "email_mdp_oublie": "Please enter your email in the required field",
-
   "mdp_non_correspondant": "Passwords do not match",
-
   "header_menu": "Menu",
   "header_commande": "Your order",
   "header_ajouterMenu": "Add Menu",
   "header_modifierMenu": "Update Menu",
   "header_supprimerMenu": "Delete Menu",
-
   "footer_connexion": "Log in",
   "footer_deconnexion": "Log out"
 }
