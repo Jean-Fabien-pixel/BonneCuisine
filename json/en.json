@@ -48,6 +48,23 @@
   "email_invalide": "⚠ Please enter a valid email.",
   "email_mdp_oublie": "Please enter your email in the required field",
   "mdp_non_correspondant": "Passwords do not match",
+
+  "ajouterMenu_h3": "Add a new menu",
+"ajouterMenu_nom": "Name :",
+"ajouterMenu_description": "Description :",
+"ajouterMenu_prix": "Price : ",
+"ajouterMenu_vf": "french version",
+"ajouterMenu_ve": "english version",
+"supprimerMenu_h3": "Delete a menu",
+"modifierMenu_h3": "Modify a menu",
+"modifierMenu_lien": "Modify",
+"modifierMenu_fr": "French",
+"modifierMenu_en": "English",
+
+  "btnSupprimer": "Delete",
+  "btnSauvegarder": "Save",
+  "btnAnnuler": "Cancel",
+
   "header_menu": "Menu",
   "header_commande": "Your order",
   "header_ajouterMenu": "Add Menu",

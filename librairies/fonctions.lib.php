@@ -282,7 +282,8 @@ function EnvoyerMessageChangeMdp($bd, $courriel, $translations)
     $id = password_hash($id, PASSWORD_DEFAULT);
 
     $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
-    $lien = "$protocol://" . $_SERVER['SERVER_NAME'] . "/bonnecuisine/motPasse.php?no=$no&id=" . urlencode($id);
+    $lien = "$protocol://" . $_SERVER['SERVER_NAME'] . "/BonneCuisine/motPasse.php?no=$no&id=" . urlencode($id);
+    print $lien;
 
     // Construire le message avec les traductions
     $message = $translations["email_mdp_intro"];
@@ -326,7 +327,7 @@ function ChangeMdp($bd, $usager, $mdp)
     header('Location: connexion.php');
 }
 
-function choisirLangue()
+function ChoisirLangue()
 {
     $lang = $_COOKIE["lang"] ?? 'fr';
     if (isset($_GET["lang"])) {
@@ -337,4 +338,152 @@ function choisirLangue()
     }
     $contenu_fichier_json = file_get_contents("json/" . $lang . ".json");
     return json_decode($contenu_fichier_json, true);
+}
+
+function AjouterMenu($bd, $nom_vf, $nom_ve, $description_vf, $description_ve, $prix)
+{
+    $requete_fr = $bd->prepare("INSERT INTO menu_fr (nom, description, prix) values(:nom, :description, :prix)");
+    $requete_fr->execute([
+        'nom' => $nom_vf,
+        'description' => $description_vf,
+        'prix' => $prix
+    ]);
+    $requete_en = $bd->prepare("INSERT INTO menu_en (nom, description, prix) values(:nom, :description, :prix)");
+    $requete_en->execute([
+        'nom' => $nom_ve,
+        'description' => $description_ve,
+        'prix' => $prix
+    ]);
+    $number = $bd->lastInsertId();
+    $fichier = $_FILES["imageMenu"]["tmp_name"];
+    move_uploaded_file($fichier, "images/tableMenu_image/$number.png");
+}
+
+function AfficherEnregistrement($bd)
+{
+    // Déterminer la table de menu selon la langue
+    $lang = $_COOKIE["lang"] ?? 'fr';
+    $tableMenu = "menu_" . $lang;
+    $select = $bd->prepare("select * from $tableMenu");
+    $select->execute([]);
+    $resultat = $select->fetchAll(PDO::FETCH_OBJ);
+
+    foreach ($resultat as $ligne) {
+        print ('<tr>');
+        print ("<td><input type='checkbox' name='chk$ligne->idMenu'></td>");
+        print ("<td>$ligne->nom</td>");
+        print ("<td>$ligne->description</td>");
+        print ("<td class='text-center'>$ligne->prix</td>");
+    }
+}
+
+function SupprimerMenu($bd)
+{
+    $lang = $_COOKIE["lang"] ?? 'fr';
+    $tableMenu = "menu_" . $lang;
+    $select = $bd->prepare("select * from $tableMenu");
+    $select->execute([]);
+    $resultat = $select->fetchAll(PDO::FETCH_OBJ);
+    foreach ($resultat as $ligne) {
+        $cocher = 'chk' . $ligne->idMenu;
+        if (isset($_POST[$cocher])) {
+            if ($_POST[$cocher]) {
+                $delete1 = $bd->prepare("delete from menu_fr where idMenu = $ligne->idMenu");
+                $delete1->execute();
+                $delete2 = $bd->prepare("delete from menu_en where idMenu = $ligne->idMenu");
+                $delete2->execute();
+                if (file_exists("images/tableMenu_image/$ligne->idMenu.png")) {
+                    unlink("images/tableMenu_image/$ligne->idMenu.png");
+                }
+            }
+        }
+    }
+}
+
+function AfficherMenuMod($bd, $lang, $translations)
+{
+    // Déterminer la table de menu selon la langue
+    $tableMenu = "menu_" . $lang;
+
+    $requete = $bd->prepare("SELECT * FROM $tableMenu");
+    $requete->execute();
+    $resultat = $requete->fetchAll(PDO::FETCH_OBJ);
+    foreach ($resultat as $ligne) {
+        print ("<div class = 'row mb-4 position-relative'>");
+        print ("<div class ='col-md-2 col position-relative d-flex align-items-center justify-content-center' >");
+        print ("<img class = 'img-fluid' src ='images/tableMenu_image/$ligne->idMenu.png'>");
+        print ("</div>");
+        print ("<div class ='col-md-8 col position-relative' style = 'text-align: start;'>");
+        print ("<div class ='position-relative top-50 start-50 translate-middle'>");
+        print ("<strong>" . $translations["menu_nom"] . " </strong>$ligne->nom <br/>");
+        print ("<strong>" . $translations["menu_remarque"] . " </strong>$ligne->description <br/>");
+        print ("<strong>" . $translations["menu_prix"] . " </strong>$ligne->prix \$ CAD <br/>");
+        print ("</div>");
+        print ("</div>");
+        print ("<div class='col-md-1 d-flex justify-content-center align-items-center'>");
+        print ("<a href='modifierMenu.php?action=modifier&no=$ligne->idMenu' class='text-decoration-underline'>"
+            . $translations["modifierMenu_lien"] . "</a>");
+        print ("</div>");
+        print ("</div>");
+    }
+}
+
+function AfficherFormModif($bd, $id, $lang, $translations)
+{
+    $tableMenu = "menu_" . $lang;
+
+    $requete = $bd->prepare("SELECT * FROM $tableMenu WHERE idMenu = $id");
+    $requete->execute();
+    $resultat = $requete->fetchAll(PDO::FETCH_OBJ);
+    foreach ($resultat as $ligne) {
+        print '
+<div class="row mb-4 position-relative">
+    <div class="col-md-2 col position-relative" >
+        <img class = "img-fluid" src ="images/tableMenu_image/' . $ligne->idMenu . '.png" alt="image ' . $ligne->idMenu . '">
+    </div>  
+    <div class="col-md-10 col position-relative" >
+        <form method="post" enctype="multipart/form-data" action="modifierMenu.php?action=modifier&id=$id">
+    <div class="input-group m-3">
+      <span class="input-group-text">' . $translations["ajouterMenu_nom"] . '</span>
+      <input type="text" value="' . $ligne->nom . '" name="nom" class="form-control">
+    </div>
+    <div class="input-group m-3">
+      <span class="input-group-text">' . $translations["ajouterMenu_description"] . '</span>
+      <input type="text" value="' . $ligne->description . '" name="description" class="form-control">
+    </div>
+    <div class="input-group m-3">
+      <span class="input-group-text">' . $translations["ajouterMenu_prix"] . '</span>
+      <input type="number" name="prix" min="0" step="0.5" value="' . $ligne->prix . '" class="form-control">
+    </div>
+    <div class="input-group m-3">
+      <input type="file" name="image" class="form-control" required>
+    </div>
+    <div class="row mt-4 position-relative d-flex align-items-center justify-content-center">
+            <button class="col-md-2 m-2 btn btn-outline-success" type="submit"
+                    name="sauvegarder">' . $translations["btnSauvegarder"] . '</button>
+            <button class="col-md-2 m-2 btn btn-outline-danger" type="reset"
+                    name="annuler">' . $translations["btnAnnuler"] . '</button>
+        </div>
+</form>
+    </div>      
+</div>';
+    }
+}
+
+function ModifierMenu($bd, $id, $lang, $nom, $description, $prix)
+{
+    $tableMenu = "menu_" . $lang;
+
+    $requete = $bd->prepare("UPDATE $tableMenu SET nom = :nom, description = :description, prix = :prix WHERE idMenu = :id ");
+    $requete->execute([
+        'nom' => $nom,
+        'description' => $description,
+        'prix' => $prix,
+        'id' => $id
+    ]);
+    if (file_exists("images/tableMenu_image/$id.png")) {
+        unlink("images/tableMenu_image/$id.png");
+    }
+    $fichier = $_FILES["imageMenu"]["tmp_name"];
+    move_uploaded_file($fichier, "images/tableMenu_image/$id.png");
 }

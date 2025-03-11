@@ -49,13 +49,13 @@
                                     href="menu.php"
                             ><?= $translations["header_menu"] ?></a><strong class="m-2 text-light">-</strong>
                             <a class="nav-link text-light fw-bold"
-                               href=""><?= $translations["header_ajouterMenu"] ?></a><strong
+                               href="ajouterMenu.php"><?= $translations["header_ajouterMenu"] ?></a><strong
                                     class="m-2 text-light">-</strong>
                             <a class="nav-link text-light fw-bold"
-                               href=""><?= $translations["header_modifierMenu"] ?></a><strong
+                               href="modifierMenu.php"><?= $translations["header_modifierMenu"] ?></a><strong
                                     class="m-2 text-light">-</strong>
                             <a class="nav-link text-light fw-bold"
-                               href=""><?= $translations["header_supprimerMenu"] ?></a>
+                               href="supprimerMenu.php"><?= $translations["header_supprimerMenu"] ?></a>
                         </div>
                     </div>
                 </div>

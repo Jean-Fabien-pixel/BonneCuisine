@@ -16,7 +16,7 @@ if (!$cookieName || !isset($_COOKIE[$cookieName])) {
     $panier = json_decode($_COOKIE[$cookieName], true);
 }
 
-$translations = choisirLangue();
+$translations = ChoisirLangue();
 
 require "inclus/entete.inc";
 $bd;

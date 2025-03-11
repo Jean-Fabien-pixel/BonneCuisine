@@ -92,3 +92,26 @@ function VerifierMdp() {
 
     return true;
 }
+
+function ValiderSuppression() {
+  var cpt = 0,
+    valide = false;
+  var checked = document.querySelectorAll("input[type=checkbox]");
+  for (var i = 0; i < checked.length; i++) {
+    if (checked[i].checked === true) {
+      cpt++;
+    }
+  }
+
+  if (cpt === 1) {
+    if (confirm("Voulez-vous supprimer ce produit ?")) {
+      valide = true;
+    }
+  } else if (cpt > 1) {
+    if (confirm(`Voulez-vous supprimer ces ${cpt} produits ?`)) {
+      valide = true;
+    }
+  }
+
+  return valide;
+}

@@ -2,7 +2,7 @@
 require "librairies/fonctions.lib.php";
 $bd;
 connecterBD($bd);
-$translations = choisirLangue();
+$translations = ChoisirLangue();
 
 $valide = true;
 if (isset($_GET["action"])) {

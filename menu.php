@@ -1,6 +1,6 @@
 <?php session_start();
 require "librairies/fonctions.lib.php";
-$translations = choisirLangue();
+$translations = ChoisirLangue();
 
 if (isset($_SESSION['courriel'])) {
     require('inclus/enteteConnecte.inc');
