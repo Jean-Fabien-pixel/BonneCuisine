@@ -340,24 +340,6 @@ function ChoisirLangue()
     return json_decode($contenu_fichier_json, true);
 }
 
-function AjouterMenu($bd, $nom_vf, $nom_ve, $description_vf, $description_ve, $prix)
-{
-    $requete_fr = $bd->prepare("INSERT INTO menu_fr (nom, description, prix) values(:nom, :description, :prix)");
-    $requete_fr->execute([
-        'nom' => $nom_vf,
-        'description' => $description_vf,
-        'prix' => $prix
-    ]);
-    $requete_en = $bd->prepare("INSERT INTO menu_en (nom, description, prix) values(:nom, :description, :prix)");
-    $requete_en->execute([
-        'nom' => $nom_ve,
-        'description' => $description_ve,
-        'prix' => $prix
-    ]);
-    $number = $bd->lastInsertId();
-    $fichier = $_FILES["imageMenu"]["tmp_name"];
-    move_uploaded_file($fichier, "images/tableMenu_image/$number.png");
-}
 
 function AfficherEnregistrement($bd)
 {
@@ -370,33 +352,10 @@ function AfficherEnregistrement($bd)
 
     foreach ($resultat as $ligne) {
         print ('<tr>');
-        print ("<td><input type='checkbox' name='chk$ligne->idMenu'></td>");
+        print ("<td><input type='checkbox' name='chk[]' value='$ligne->idMenu'></td>");
         print ("<td>$ligne->nom</td>");
         print ("<td>$ligne->description</td>");
         print ("<td class='text-center'>$ligne->prix</td>");
-    }
-}
-
-function SupprimerMenu($bd)
-{
-    $lang = $_COOKIE["lang"] ?? 'fr';
-    $tableMenu = "menu_" . $lang;
-    $select = $bd->prepare("select * from $tableMenu");
-    $select->execute([]);
-    $resultat = $select->fetchAll(PDO::FETCH_OBJ);
-    foreach ($resultat as $ligne) {
-        $cocher = 'chk' . $ligne->idMenu;
-        if (isset($_POST[$cocher])) {
-            if ($_POST[$cocher]) {
-                $delete1 = $bd->prepare("delete from menu_fr where idMenu = $ligne->idMenu");
-                $delete1->execute();
-                $delete2 = $bd->prepare("delete from menu_en where idMenu = $ligne->idMenu");
-                $delete2->execute();
-                if (file_exists("images/tableMenu_image/$ligne->idMenu.png")) {
-                    unlink("images/tableMenu_image/$ligne->idMenu.png");
-                }
-            }
-        }
     }
 }
 
@@ -442,7 +401,7 @@ function AfficherFormModif($bd, $id, $lang, $translations)
         <img class = "img-fluid" src ="images/tableMenu_image/' . $ligne->idMenu . '.png" alt="image ' . $ligne->idMenu . '">
     </div>  
     <div class="col-md-10 col position-relative" >
-        <form method="post" enctype="multipart/form-data" action="modifierMenu.php?action=modifier&id=$id">
+        <form method="post" enctype="multipart/form-data" action="modifierMenu.php?action=modifier&id='.$id.'">
     <div class="input-group m-3">
       <span class="input-group-text">' . $translations["ajouterMenu_nom"] . '</span>
       <input type="text" value="' . $ligne->nom . '" name="nom" class="form-control">
@@ -455,9 +414,12 @@ function AfficherFormModif($bd, $id, $lang, $translations)
       <span class="input-group-text">' . $translations["ajouterMenu_prix"] . '</span>
       <input type="number" name="prix" min="0" step="0.5" value="' . $ligne->prix . '" class="form-control">
     </div>
-    <div class="input-group m-3">
-      <input type="file" name="image" class="form-control" required>
-    </div>
+    <div class="mb-3 drop-zone text-center p-3" style="border: 2px dashed gray; background-color:rgb(229, 234, 238); ">
+                    <p class="mb-1">' . $translations["glisser_deposer"] . ' </p>
+                    <p class="mb-2">' . $translations["ou"] . '</p>
+            <label for="fileInput" class="btn btn-outline-secondary">' . $translations["selection_image"] . '</label>
+            <input type="file" name="imageMenu" id="fileInput" class="d-none" accept="image/png, image/jpg">
+        </div>
     <div class="row mt-4 position-relative d-flex align-items-center justify-content-center">
             <button class="col-md-2 m-2 btn btn-outline-success" type="submit"
                     name="sauvegarder">' . $translations["btnSauvegarder"] . '</button>
