@@ -14,20 +14,15 @@ if (!file_exists('uploads')) {
 
 // Générer un nom
 $filename = $_FILES['imageMenu']['name'];
-$extension = pathinfo($filename, PATHINFO_EXTENSION);
-if ($extension == '.png') {
-    $extension = '.png';
-} else {
-    $extension = '.jpg';
-}
-$destination = 'uploads/img' . $extension;
+$extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+$destination = 'uploads/img.' . $extension;
 
 
 // Déplacer le fichier
-if (move_uploaded_file($filename, $destination)) {
-    echo $filename;  // Renvoyer le chemin du fichier au client
+if (move_uploaded_file($_FILES['imageMenu']['tmp_name'], $destination)) {
+    echo "Succès du téléversement";
 } else {
-    echo "Erreur lors du téléchargement.";
-}
-die;
+    echo "Erreur lors du téléversement.";}
+die
+;
 ?>

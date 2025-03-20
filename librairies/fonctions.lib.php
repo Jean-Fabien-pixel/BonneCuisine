@@ -19,9 +19,18 @@ function AfficherMenu($bd, $isSessionActive, $lang, $translations)
     $requete->execute();
     $resultat = $requete->fetchAll(PDO::FETCH_OBJ);
     foreach ($resultat as $ligne) {
+        // Construire le chemin sans extension
+        $imageBase = "images/tableMenu_image/" . $ligne->idMenu;
+
+        // Chercher une image avec n'importe quelle extension
+        $image = glob($imageBase . ".*");
+
+        // Si une image est trouvée, on l'utilise, sinon image par défaut
+        $imagePath = !empty($image) ? $image[0] : "images/default.png";
+
         print ("<div class = 'row mb-4 position-relative'>");
         print ("<div class ='col-md-2 col position-relative d-flex align-items-center justify-content-center' >");
-        print ("<img class = 'img-fluid' src ='images/tableMenu_image/$ligne->idMenu.png'>");
+        print ("<img class = 'img-fluid' src ='$imagePath'>");
         print ("</div>");
         print ("<div class ='col-md-8 col position-relative' style = 'text-align: start;'>");
         print ("<div class ='position-relative top-50 start-50 translate-middle'>");
@@ -367,21 +376,30 @@ function AfficherMenuMod($bd, $lang, $translations)
     $requete = $bd->prepare("SELECT * FROM $tableMenu");
     $requete->execute();
     $resultat = $requete->fetchAll(PDO::FETCH_OBJ);
+
     foreach ($resultat as $ligne) {
-        print ("<div class = 'row mb-4 position-relative'>");
-        print ("<div class ='col-md-2 col position-relative d-flex align-items-center justify-content-center' >");
-        print ("<img class = 'img-fluid' src ='images/tableMenu_image/$ligne->idMenu.png'>");
+        // Construire le chemin sans extension
+        $imageBase = "images/tableMenu_image/" . $ligne->idMenu;
+
+        // Chercher une image avec n'importe quelle extension
+        $image = glob($imageBase . ".*");
+
+        // Si une image est trouvée, on l'utilise, sinon image par défaut
+        $imagePath = !empty($image) ? $image[0] : "images/default.png";
+
+        print ("<div class='row mb-4 position-relative'>");
+        print ("<div class='col-md-2 col position-relative d-flex align-items-center justify-content-center'>");
+        print ("<img class='img-fluid' src='$imagePath' alt='Image de $ligne->nom'>");
         print ("</div>");
-        print ("<div class ='col-md-8 col position-relative' style = 'text-align: start;'>");
-        print ("<div class ='position-relative top-50 start-50 translate-middle'>");
+        print ("<div class='col-md-8 col position-relative' style='text-align: start;'>");
+        print ("<div class='position-relative top-50 start-50 translate-middle'>");
         print ("<strong>" . $translations["menu_nom"] . " </strong>$ligne->nom <br/>");
         print ("<strong>" . $translations["menu_remarque"] . " </strong>$ligne->description <br/>");
         print ("<strong>" . $translations["menu_prix"] . " </strong>$ligne->prix \$ CAD <br/>");
         print ("</div>");
         print ("</div>");
         print ("<div class='col-md-1 d-flex justify-content-center align-items-center'>");
-        print ("<a href='modifierMenu.php?action=modifier&no=$ligne->idMenu' class='text-decoration-underline'>"
-            . $translations["modifierMenu_lien"] . "</a>");
+        print ("<a href='modifierMenu.php?action=modifier&no=$ligne->idMenu' class='text-decoration-underline'>" . $translations["modifierMenu_lien"] . "</a>");
         print ("</div>");
         print ("</div>");
     }
@@ -395,13 +413,22 @@ function AfficherFormModif($bd, $id, $lang, $translations)
     $requete->execute();
     $resultat = $requete->fetchAll(PDO::FETCH_OBJ);
     foreach ($resultat as $ligne) {
+        // Construire le chemin sans extension
+        $imageBase = "images/tableMenu_image/" . $ligne->idMenu;
+
+        // Chercher une image avec n'importe quelle extension
+        $image = glob($imageBase . ".*");
+
+        // Si une image est trouvée, on l'utilise, sinon image par défaut
+        $imagePath = !empty($image) ? $image[0] : "images/default.png";
+
         print '
 <div class="row mb-4 position-relative">
     <div class="col-md-2 col position-relative" >
-        <img class = "img-fluid" src ="images/tableMenu_image/' . $ligne->idMenu . '.png" alt="image ' . $ligne->idMenu . '">
+        <img class = "img-fluid" src = "' . $imagePath . '" alt="image ' . $ligne->idMenu . '">
     </div>  
     <div class="col-md-10 col position-relative" >
-        <form method="post" enctype="multipart/form-data" action="modifierMenu.php?action=modifier&id='.$id.'">
+        <form method="post" enctype="multipart/form-data" action="modifierMenu.php?action=modifier&id=' . $id . '">
     <div class="input-group m-3">
       <span class="input-group-text">' . $translations["ajouterMenu_nom"] . '</span>
       <input type="text" value="' . $ligne->nom . '" name="nom" class="form-control">
@@ -414,12 +441,16 @@ function AfficherFormModif($bd, $id, $lang, $translations)
       <span class="input-group-text">' . $translations["ajouterMenu_prix"] . '</span>
       <input type="number" name="prix" min="0" step="0.5" value="' . $ligne->prix . '" class="form-control">
     </div>
-    <div class="mb-3 drop-zone text-center p-3" style="border: 2px dashed gray; background-color:rgb(229, 234, 238); ">
-                    <p class="mb-1">' . $translations["glisser_deposer"] . ' </p>
-                    <p class="mb-2">' . $translations["ou"] . '</p>
-            <label for="fileInput" class="btn btn-outline-secondary">' . $translations["selection_image"] . '</label>
-            <input type="file" name="imageMenu" id="fileInput" class="d-none" accept="image/png, image/jpg">
+    <div class="mb-3 drop-zone text-center p-3" id="drop_file_zone"
+         ondrop="upload_file(event)" ondragover="return false;"
+         style="border: 2px dashed gray; background-color:rgb(229, 234, 238);">
+        <div id="drag_upload_file">
+            <p class="mb-1">' . $translations["glisser_deposer"] . '</p>
+            <p class="mb-2">' . $translations["ou"] . '</p>
+            <p><input type="button" value="Select File" onclick="file_explorer();"></p>
+			<input type="file" id="selectfile" name="imageMenu" class="d-none">
         </div>
+    </div>
     <div class="row mt-4 position-relative d-flex align-items-center justify-content-center">
             <button class="col-md-2 m-2 btn btn-outline-success" type="submit"
                     name="sauvegarder">' . $translations["btnSauvegarder"] . '</button>

@@ -40,7 +40,6 @@ if (isset($_GET["action"]) && $_GET["action"] == "modifier") {
         } else {
             echo "<p class='text-danger'>Erreur lors de la modification ❌</p>";
         }
-        var_dump($_POST["nom"], $_POST["description"], $_POST["prix"]);
     }
 }
 
@@ -51,15 +50,6 @@ if (isset($_GET["no"])) {
     $checked = ($lang === 'en') ? "checked" : "";
     $no = $_GET["no"];
     print '
-<script>
-//    window.history.pushState({}, "", "modifierMenu.php?action=modifier&no=' . $_GET['no'] . '"); 
-//    
-//    window.onpopstate = function(event) {
-//        window.location.href = "modifierMenu.php";
-//    };
-//window.location.replace("modifierMenu.php");
-
-</script>
 <div class="d-flex justify-content-end align-items-center">
     <span class="d-flex align-items-center">
         <div class="me-2">' . $translations["modifierMenu_fr"] . '</div>

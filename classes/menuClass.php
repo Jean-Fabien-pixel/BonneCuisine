@@ -87,18 +87,19 @@ class menuClass
     public function modifierMenuBD($bd, $nom, $description, $prix, $table): bool
     {
         $requete = $bd->prepare("UPDATE $table SET nom=:nom, description=:description, prix=:prix WHERE idMenu=:id");
-        $resultat = $requete->execute([
-            'id' => $this->idMenu,
+        $requete->execute(['id' => $this->idMenu,
             'nom' => $nom,
             'description' => $description,
-            'prix' => $prix
-        ]);
+            'prix' => $prix]);
 
-        if (!$resultat) {
-            var_dump($requete->errorInfo()); // Affiche l'erreur SQL si la requête échoue
+        $image_temporaire = glob("uploads/img.*");
+        if (!empty($image_temporaire)) {
+            return true;
+        } else {
+            $this->modifierImage($this->idMenu);
         }
 
-        return $resultat;
+        return true;
     }
 
     public function supprimerMenuBD(PDO $bd): bool
@@ -118,48 +119,52 @@ class menuClass
 
     private function ajouterImage($number): bool
     {
-        $filename = $_FILES['file']['name'];
-        $extension = pathinfo($filename, PATHINFO_EXTENSION);
-        if ($extension == '.png') {
-            $extension = '.png';
-        } else {
-            $extension = '.jpg';
+        // Cherche une image existante dans /uploads/
+        $image_temporaire = glob("uploads/img.*"); // Cherche img.png, img.jpg, img.jpeg...
+
+        if (empty($image_temporaire)) {
+            return false; // Aucune image trouvée
+        }
+        // Récupère l'extension
+        $extension = pathinfo($image_temporaire[0], PATHINFO_EXTENSION);
+
+        // Définir le chemin final
+        $destination = "images/tableMenu_image/{$number}.{$extension}";
+
+        // Déplacer l'image vers sa destination finale
+        if (rename($image_temporaire[0], $destination)) {
+            return true; // Succès
         }
 
-        $fichier = 'uploads/img' . $extension;  // Récupérer le nom de l'image depuis le formulaire
-        $destination = "images/tableMenu_image/{$number}.jpg";  // Renommer avec l'ID du menu
-
-
-        if (file_exists($fichier)) {
-            rename($fichier, $destination);
-        } else {
-            return false;  // Erreur : image non trouvée
-        }
-        return true;
+        return false;
     }
 
-    private function modifierImage(): bool
+
+    private function modifierImage($number): bool
     {
-        if ($_FILES["imageMenu"]) {
-            $fichier = $_FILES["imageMenu"]["tmp_name"];
-            $destination = "images/tableMenu_image/$this->idMenu.png";
-            unlink($destination);
-            if (move_uploaded_file($fichier, $destination)) {
-                return true;
-            }
-            return true;
-        }
-        return false;
+        // Supprimer l'ancienne image
+        $this->supprimerImage($number);
+        // Déplacer le fichier téléchargé vers la destination finale
+        $this->ajouterImage($number);
+
+        // Aucun fichier téléchargé, donc on ne fait rien
+        return true;
     }
 
     public function supprimerImage($id): bool
     {
-        // Supprimer l'image associée
-        $destination = "images/tableMenu_image/{$id}.png";
-        if (file_exists($destination)) {
-            unlink($destination);
+        // Définir les extensions possibles
+        $extensions = ['png', 'jpg', 'jpeg'];
+
+        // Vérifier et supprimer l'image avec la bonne extension
+        foreach ($extensions as $ext) {
+            $fichier = "images/tableMenu_image/{$id}.{$ext}";
+            if (file_exists($fichier)) {
+                unlink($fichier);
+                return true;
+            }
         }
-        return true;
+        return false;
     }
 
 }

@@ -118,68 +118,37 @@ function ValiderSuppression() {
 
 var fileobj;
 
-// Gère le drop d'un fichier
-function upload_file(e) {
-    e.preventDefault();
+		function upload_file(e) {
+			e.preventDefault();
+			fileobj = e.dataTransfer.files[0];
+			ajax_file_upload(fileobj);
+		}
 
-    // Récupérer le fichier déposé
-    fileobj = e.dataTransfer.files[0];
+		function file_explorer() {
+			document.getElementById('selectfile').click();
+			document.getElementById('selectfile').onchange = function() {
+				fileobj = document.getElementById('selectfile').files[0];
+				ajax_file_upload(fileobj);
+			};
+			fileobj = document.getElementById('selectfile').files[0];
+			ajax_file_upload(fileobj);
+		}
 
-    // Mettre à jour l'input file pour conserver le fichier
-    document.getElementById('selectfile').files = e.dataTransfer.files;
-
-    // Afficher un aperçu de l'image sélectionnée
-    afficherApercu(fileobj);
-
-    // Envoyer le fichier via AJAX à ajax.php
-    ajax_file_upload(fileobj);
-}
-
-// Gère la sélection d'un fichier via le bouton
-document.getElementById('selectfile').addEventListener('change', function () {
-    fileobj = this.files[0];
-    afficherApercu(fileobj);
-
-    // Envoyer le fichier via AJAX à ajax.php
-    ajax_file_upload(fileobj);
-});
-
-// Fonction pour afficher un aperçu de l'image sélectionnée
-function afficherApercu(file) {
-    if (file) {
-        var reader = new FileReader();
-        reader.onload = function (e) {
-            var previewDiv = document.getElementById("preview");
-            previewDiv.innerHTML = ''; // Réinitialiser l'aperçu
-
-            var img = document.createElement("img");
-            img.src = e.target.result;
-            img.style.maxWidth = "150px";
-            img.style.marginTop = "10px";
-            img.style.borderRadius = "10px";
-
-            previewDiv.appendChild(img);
-        };
-        reader.readAsDataURL(file);
-    }
-}
-
-// Envoi du fichier au serveur via AJAX
-function ajax_file_upload(file_obj) {
-    if (file_obj !== undefined) {
-        var form_data = new FormData();
-        form_data.append('file', file_obj);
-
-        $.ajax({
-            type: 'POST',
-            url: 'ajax.php',  // Le fichier qui traite l'upload
-            contentType: false,
-            processData: false,
-            data: form_data,
-            success: function (response) {
-                alert(response);
-                $('#selectfile').val('');
-            },
-        });
-    }
-}
+		function ajax_file_upload(file_obj) {
+			if (file_obj !== undefined) {
+				var form_data = new FormData();
+				form_data.append('imageMenu', file_obj);
+				$.ajax({
+					type: 'POST',
+					url: 'ajax.php',
+					contentType: false,
+					processData: false,
+					data: form_data,
+					success: function(response) {
+						alert(response);
+                        console.log(response);
+						$('#selectfile').val('');
+					}
+				});
+			}
+		}

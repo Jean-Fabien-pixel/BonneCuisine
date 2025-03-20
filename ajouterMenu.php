@@ -38,9 +38,8 @@ print ('<form method="post" enctype="multipart/form-data" action="ajouterMenu.ph
         <div id="drag_upload_file">
             <p class="mb-1">' . $translations["glisser_deposer"] . '</p>
             <p class="mb-2">' . $translations["ou"] . '</p>
-            <label for="selectfile" class="btn btn-outline-secondary">' . $translations["selection_image"] . '</label>
-            <input type="file" name="imageMenu" id="selectfile" class="d-none" accept="image/png, image/jpg, image/jpeg">
-            <div id="preview" class="mt-2"></div>
+            <p><input type="button" value="Select File" onclick="file_explorer();"></p>
+			<input type="file" id="selectfile" name="imageMenu" class="d-none">
         </div>
     </div>
     <div class="row mt-4 position-relative d-flex align-items-center justify-content-center">
