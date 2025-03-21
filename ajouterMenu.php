@@ -43,7 +43,7 @@ print ('<form method="post" enctype="multipart/form-data" action="ajouterMenu.ph
         </div>
     </div>
     <div class="row mt-4 position-relative d-flex align-items-center justify-content-center">
-            <button class="col-md-2 m-2 btn btn-outline-success" type="submit"
+            <button class="col-md-2 m-2 btn btn-outline-success" type="submit" onclick="return verifier_fichier();"
                     name="sauvegarder">' . $translations["btnSauvegarder"] . '</button>
             <button class="col-md-2 m-2 btn btn-outline-danger" type="reset"
                     name="annuler">' . $translations["btnAnnuler"] . '</button>

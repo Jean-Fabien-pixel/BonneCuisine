@@ -94,12 +94,10 @@ class menuClass
 
         $image_temporaire = glob("uploads/img.*");
         if (!empty($image_temporaire)) {
-            return true;
-        } else {
             $this->modifierImage($this->idMenu);
+            return true;
         }
-
-        return true;
+        return false;
     }
 
     public function supprimerMenuBD(PDO $bd): bool
